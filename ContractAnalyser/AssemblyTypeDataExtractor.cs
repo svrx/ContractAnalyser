@@ -34,9 +34,8 @@ namespace TypeAnalyser
                 UniqueName = assembly.ToString(),
                 Type = MemberTypeNames.Assembly,
                 Attributes = assembly.GetAttributesData()
-            };
-                       
-            rootNode.AddChildren(
+            }
+            .AddChildren(
                 assembly.GetExportedTypes()
                     .OrderBy(p => p.Name)
                     .Select(type => BuildTypeMemberNode(type))

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeAnalyser", "TypeAnalyser\TypeAnalyser.csproj", "{DAA74154-3B67-4339-9F17-4095302527C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContractAnalyser", "ContractAnalyser\ContractAnalyser.csproj", "{DAA74154-3B67-4339-9F17-4095302527C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

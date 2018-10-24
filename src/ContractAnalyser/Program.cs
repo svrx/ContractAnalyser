@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using ContractAnalyser.Extractors;
 using ContractAnalyser.Utils;
@@ -17,8 +15,8 @@ namespace ContractAnalyser
         {
             var measure = new MeasureCommand("Assembly Processing");
             
-            var beforeTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"D:\Workspace\Pleo\Sdk\bin\Newtonsoft.Json.dll").ExtractNodesData());
-            var afterTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"D:\Workspace\Pleo\Sdk\bin\Debug\Newtonsoft.Json.dll").ExtractNodesData());
+            var beforeTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"..\log4net_1.2.10.dll").ExtractNodesData());
+            var afterTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"..\log4net_2.0.8_net45.dll").ExtractNodesData());
 
             Task.WhenAll(beforeTask, afterTask).Wait();
 

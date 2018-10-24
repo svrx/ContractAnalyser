@@ -4,19 +4,45 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CommandLine;
 using ContractAnalyser.Extractors;
 using ContractAnalyser.Utils;
 
 namespace ContractAnalyser
 {
+    public class Options
+    {
+        [Value(0, Required = true, HelpText = "Reference base assembly path (older version)")]
+        //[Option('b', "base", Required = true, HelpText = "Reference base assembly path (older version)")]
+        public string PreviousAssemblyPath { get; set; }
+
+        [Value(1, Required = true, HelpText = "Target assembly path for analysis (newer version)")]
+        //[Option('t', "target", Required = true, HelpText = "Target assembly path for analysis (newer version)")]
+        public string TargetAssemblyPath { get; set; }
+
+        [Option('r', "ruleset", Required = false, HelpText = "Ruleset name used to check for breaking changes")]
+        public string RuleSet { get; set; }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
+            var parser = Parser.Default;
+
+            parser.ParseArguments<Options>(args)
+                .WithParsed(o =>
+                {
+                    PerformContactAnalysis(o);
+                });            
+        }
+
+        private static void PerformContactAnalysis(Options options)
+        {
             var measure = new MeasureCommand("Assembly Processing");
-            
-            var beforeTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"..\log4net_1.2.10.dll").ExtractNodesData());
-            var afterTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"..\log4net_2.0.8_net45.dll").ExtractNodesData());
+
+            var beforeTask = Task.Run(() => new AssemblyMemberNodeExtractor(options.PreviousAssemblyPath).ExtractNodesData());
+            var afterTask = Task.Run(() => new AssemblyMemberNodeExtractor(options.TargetAssemblyPath).ExtractNodesData());
 
             Task.WhenAll(beforeTask, afterTask).Wait();
 
@@ -24,15 +50,15 @@ namespace ContractAnalyser
             var afterRoot = afterTask.Result;
 
             measure.Dispose();
-            
+
             measure = new MeasureCommand("Detecting Changes");
-            
+
             var diff = GetTreeDiff(beforeRoot, afterRoot);
 
             measure.Dispose();
-            
+
             measure = new MeasureCommand("Evaluating RuleSet");
-            
+
             bool breakingChange = CheckForBreakingChanges(diff);
 
             measure.Dispose();

@@ -1,7 +1,7 @@
 ﻿using System;
 
 //https://bitlush.com/blog/executing-code-in-a-separate-application-domain-using-c-sharp
-namespace TypeAnalyser.Utils
+namespace ContractAnalyser.Utils
 {
     public sealed class Isolated<T> : IDisposable where T : MarshalByRefObject
     {

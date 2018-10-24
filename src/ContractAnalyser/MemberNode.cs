@@ -5,12 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using YamlDotNet.Serialization;
 
-namespace TypeAnalyser
+namespace ContractAnalyser
 {
     [Serializable]
     public class MemberNode
     {
-
         public string UniqueName { get; set; }
         /// <summary>
         /// Local name
@@ -21,7 +20,7 @@ namespace TypeAnalyser
         
         [JsonIgnore, YamlIgnore]
         public MemberNode Parent { get; set; }
-        public List<MemberNode> Children { get; set; } = new List<MemberNode>();
+        public List<MemberNode> Children { get; set; } = new List<MemberNode>(6);
 
         public MemberNode AddChildren(params MemberNode[] childNodes)
         {

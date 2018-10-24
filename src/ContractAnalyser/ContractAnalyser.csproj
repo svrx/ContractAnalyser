@@ -49,10 +49,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyTypeDataExtractor.cs" />
+    <Compile Include="Extractors\AssemblyMemberNodeExtractor.cs" />
+    <Compile Include="IMemberNodeExtractor.cs" />
+    <Compile Include="Extractors\IsolatedAssemblyHandler.cs" />
+    <Compile Include="TreeDiff.cs" />
     <Compile Include="Utils\Isolated.cs" />
     <Compile Include="MemberNode.cs" />
-    <Compile Include="MemberNodeExtensions.cs" />
     <Compile Include="Utils\ObjectDumpExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,7 +64,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Extractors\" />
     <Folder Include="RuleSets\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

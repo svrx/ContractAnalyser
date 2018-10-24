@@ -6,28 +6,38 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TypeAnalyser.Utils;
+using ContractAnalyser.Extractors;
+using ContractAnalyser.Utils;
 
-namespace TypeAnalyser
+namespace ContractAnalyser
 {
     class Program
     {
         static void Main(string[] args)
         {
-            //ThreadPool.SetMinThreads(4, 1);
-            var sw = Stopwatch.StartNew();
-
-            var beforeTask = Task.Run(() => AssemblyTypeDataExtractor.ExtractTypesData(@"D:\Workspace\Pleo\Sdk\bin\Pleo.Sdk.dll"));
-            var afterTask = Task.Run(() => AssemblyTypeDataExtractor.ExtractTypesData(@"D:\Workspace\Pleo\Sdk\bin\Debug\Pleo.Sdk.dll"));
+            var measure = new MeasureCommand("Assembly Processing");
+            
+            var beforeTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"D:\Workspace\Pleo\Sdk\bin\Newtonsoft.Json.dll").ExtractNodesData());
+            var afterTask = Task.Run(() => new AssemblyMemberNodeExtractor(@"D:\Workspace\Pleo\Sdk\bin\Debug\Newtonsoft.Json.dll").ExtractNodesData());
 
             Task.WhenAll(beforeTask, afterTask).Wait();
 
             var beforeRoot = beforeTask.Result;
             var afterRoot = afterTask.Result;
 
+            measure.Dispose();
+            
+            measure = new MeasureCommand("Detecting Changes");
+            
             var diff = GetTreeDiff(beforeRoot, afterRoot);
 
-            var breakingChange = CheckForBreakingChanges(diff);
+            measure.Dispose();
+            
+            measure = new MeasureCommand("Evaluating RuleSet");
+            
+            bool breakingChange = CheckForBreakingChanges(diff);
+
+            measure.Dispose();
 
             if (breakingChange)
             {
@@ -37,9 +47,6 @@ namespace TypeAnalyser
             else
                 Console.WriteLine("No breaking changes detected. Good Job!");
 
-            sw.Stop();
-
-            Console.WriteLine($"Took {(int)sw.ElapsedMilliseconds}ms.");
 
             File.WriteAllText(".\\output-before.yaml", beforeRoot.DumpAsYaml());
             File.WriteAllText(".\\output-after.yaml", afterRoot.DumpAsYaml());
@@ -47,7 +54,6 @@ namespace TypeAnalyser
             //File.WriteAllText(".\\output-after.json", afterRoot.DumpAsJson());
             File.WriteAllText(".\\diff.yaml", diff.DumpAsYaml());
         }
-
 
         private static bool CheckForBreakingChanges(TreeDiff<MemberNode> diff)
         {
@@ -62,7 +68,7 @@ namespace TypeAnalyser
                 .ForEach(p =>
                 {
                     breakingChange = true;
-                    Console.Error.WriteLine($"ADD: Parameter '{p.Name}' was added/changed to '{p.Parent.Name}'");
+                    Console.Error.WriteLine($"ADD: Parameter '{p.UniqueName}' was added/changed to '{p.Parent?.Name}'");
                 });
 
             //Removals
@@ -72,7 +78,7 @@ namespace TypeAnalyser
                 .ForEach(p =>
                 {
                     breakingChange = true;
-                    Console.Error.WriteLine($"REM: {p.Type} '{p.Name}' has been removed/changed from '{p.Parent.Name}' and wasn't previously considered obsolete");
+                    Console.Error.WriteLine($"REM: {p.Type} '{p.Parent?.Name}.{p.Name}' has been removed/changed and wasn't previously considered obsolete");
                 });
 
             return breakingChange;
@@ -95,22 +101,34 @@ namespace TypeAnalyser
             {
                 Deleted = deleted
                     .Select(p => beforeNames[p])
-                    .Where(p => !deleted.Contains(p.Parent.ToString())) //Keep only tree delta roots
+                    .Where(p => p.Parent == null || !deleted.Contains(p.Parent.ToString())) //Keep only tree delta roots
                     .ToList(),
                 Inserted = inserted.Select(p => afterNames[p])
-                    .Where(p => !inserted.Contains(p.Parent.ToString())) //Keep only tree delta roots
+                    .Where(p => p.Parent == null || !inserted.Contains(p.Parent.ToString())) //Keep only tree delta roots
                     .ToList()
             };
         }
     }
 
-
-
-    public class TreeDiff<T>
-        where T:class
+    public class MeasureCommand : IDisposable
     {
-        public List<T> Deleted { get; set; }
-        public List<T> Inserted { get; set; }
+        private readonly string _actionName;
+        private Stopwatch _sw;
+
+        public MeasureCommand(string actionName)
+        {
+            _sw = Stopwatch.StartNew();            
+            _actionName = actionName;
+        }
+
+        public void Dispose()
+        {
+            _sw.Stop();
+            if(string.IsNullOrEmpty(_actionName))
+                Console.WriteLine($"Took {(int)_sw.ElapsedMilliseconds}ms.");
+            else
+                Console.WriteLine($"{_actionName} took {(int)_sw.ElapsedMilliseconds}ms.");
+        }
     }
 
     public static class MemberTypeNames

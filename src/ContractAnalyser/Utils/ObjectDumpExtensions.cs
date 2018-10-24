@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using YamlDotNet.Serialization;
 
-namespace TypeAnalyser.Utils
+namespace ContractAnalyser.Utils
 {
     public static class ObjectDumpExtensions
     {
@@ -23,15 +23,6 @@ namespace TypeAnalyser.Utils
 
         public static string DumpAsJson(this object o)
         {
-            //var stringBuilder = new StringBuilder();
-
-            //var serializer = JsonSerializer.CreateDefault(new JsonSerializerSettings {
-            //    DefaultValueHandling = DefaultValueHandling.Ignore,
-            //    Formatting = Formatting.Indented
-            //});
-
-            //serializer.Serialize(new TextWriter(new StringWriter(stringBuilder)), o);
-
             return JsonConvert.SerializeObject(o);
         }
     }

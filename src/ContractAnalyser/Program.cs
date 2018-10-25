@@ -33,7 +33,8 @@ namespace ContractAnalyser
             parser.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
-                    PerformContactAnalysis(o);
+                    var extractor = new RoslynMemberNodeExtractor(o.PreviousAssemblyPath);
+                    //PerformContactAnalysis(o);
                 });            
         }
 

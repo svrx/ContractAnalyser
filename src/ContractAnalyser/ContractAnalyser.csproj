@@ -37,10 +37,13 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\MemberKind.cs" />
     <Compile Include="Extractors\AssemblyMemberNodeExtractor.cs" />
+    <Compile Include="Extractors\DisposableBlock.cs" />
     <Compile Include="Extractors\RoslynMemberNodeExtractor.cs" />
     <Compile Include="IMemberNodeExtractor.cs" />
     <Compile Include="Extractors\IsolatedAssemblyHandler.cs" />
+    <Compile Include="Domain\Member.cs" />
     <Compile Include="TreeDiff.cs" />
     <Compile Include="Utils\Isolated.cs" />
     <Compile Include="MemberNode.cs" />

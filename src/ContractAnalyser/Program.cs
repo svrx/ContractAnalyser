@@ -33,8 +33,11 @@ namespace ContractAnalyser
             parser.ParseArguments<Options>(args)
                 .WithParsed(o =>
                 {
-                    var extractor = new RoslynMemberNodeExtractor(o.PreviousAssemblyPath);
                     //PerformContactAnalysis(o);
+
+                    var extractor = new RoslynMemberNodeExtractor(o.TargetAssemblyPath);
+                    var assemblyMembers = extractor.ExtractNodesData();
+                    File.WriteAllText("..\\output-assembly-members.yaml", assemblyMembers.DumpAsYaml());                    
                 });            
         }
 
@@ -73,11 +76,11 @@ namespace ContractAnalyser
                 Console.WriteLine("No breaking changes detected. Good Job!");
 
 
-            File.WriteAllText(".\\output-before.yaml", beforeRoot.DumpAsYaml());
-            File.WriteAllText(".\\output-after.yaml", afterRoot.DumpAsYaml());
+            File.WriteAllText("..\\output-before.yaml", beforeRoot.DumpAsYaml());
+            File.WriteAllText("..\\output-after.yaml", afterRoot.DumpAsYaml());
             //File.WriteAllText(".\\output-before.json", beforeRoot.DumpAsJson());
             //File.WriteAllText(".\\output-after.json", afterRoot.DumpAsJson());
-            File.WriteAllText(".\\diff.yaml", diff.DumpAsYaml());
+            File.WriteAllText("..\\diff.yaml", diff.DumpAsYaml());
         }
 
         private static bool CheckForBreakingChanges(TreeDiff<MemberNode> diff)

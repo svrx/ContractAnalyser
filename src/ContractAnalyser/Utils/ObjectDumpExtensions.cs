@@ -14,7 +14,6 @@ namespace ContractAnalyser.Utils
         {
             var stringBuilder = new StringBuilder();
             var serializer = new SerializerBuilder()
-                .EnsureRoundtrip()
                 .Build();
             
             serializer.Serialize(new IndentedTextWriter(new StringWriter(stringBuilder)), o, o.GetType());
